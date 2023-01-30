@@ -1,0 +1,19 @@
+body {
+    margin: auto;
+    padding: auto;
+    border:auto;
+    width: 100vw;
+    height: 100vh;
+    /* Current underlying issue is that even though the canvas is smart and adjusts to the scale of your window, it is just the tiniest bit big and caused overflow */
+    overflow: hidden;
+}
+canvas {
+    background-color: rgb(207, 207, 207);
+    overflow: hidden;
+}
+
+div {
+    width: 5rem;
+    height: 5rem;
+    background-color: orange;
+}
