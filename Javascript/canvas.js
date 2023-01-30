@@ -1,8 +1,9 @@
 const canvas = document.querySelector('#canvas')
 let ctx = canvas.getContext('2d')
-var scale = 1, xFrom = -10, xTo = 10, yFrom = -10, yTo = 10;
-var mousedown = false, wasDown = false, dragging = false;
-var xMouse = 0, yMouse = 0;
+var scale = 1, xFrom = -10, xTo = 10, yFrom = -10, yTo = 10
+var mousedown = false, wasDown = false, dragging = false
+var xMouse = 0, yMouse = 0
+const sensitivity = 150
 
 draw()
 addEventListener('resize', draw)
@@ -24,12 +25,12 @@ canvas.addEventListener('mousemove', (event) => {
     } else if (!wasDown)
     {
         wasDown = true
-        xMouse = window.event.clientX / 100
-        yMouse = window.event.clientY / 100
+        xMouse = window.event.clientX / sensitivity
+        yMouse = window.event.clientY / sensitivity
     }
 
-    xMouse -= window.event.clientX /100
-    yMouse -= window.event.clientY /100
+    xMouse -= window.event.clientX / sensitivity
+    yMouse -= window.event.clientY / sensitivity
 
     xTo += xMouse
     xFrom += xMouse
@@ -38,8 +39,8 @@ canvas.addEventListener('mousemove', (event) => {
 
     draw()
 
-    xMouse = window.event.clientX / 100
-    yMouse = window.event.clientY / 100
+    xMouse = window.event.clientX / sensitivity
+    yMouse = window.event.clientY / sensitivity
 })
 
 // This method is called at program start and anytime the size of the window changes, redrawing the entire program onto screen.
