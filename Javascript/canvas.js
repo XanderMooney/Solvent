@@ -4,33 +4,31 @@ var scale = 1, xFrom = -10, xTo = 10, yFrom = -10, yTo = 10
 var mousedown = false, wasDown = false, dragging = false
 var xMouse = 0, yMouse = 0
 const sensitivity = 150
+var clientX = 0, clientY = 0
 
 draw()
 addEventListener('resize', draw)
 
 // Change the scale whenever the user uses the mousewheel
-addEventListener('wheel', (event) => {
+addEventListener('wheel', function() {
     scale += event.deltaY * -0.01
 })
 
-canvas.addEventListener('mousedown', (event) => { mousedown = true })
-canvas.addEventListener('mouseup', (event) => { mousedown = false })
+canvas.addEventListener('mousedown', function() { mousedown = true })
+canvas.addEventListener('mouseup', function() { mousedown = false })
 
-canvas.addEventListener('mousemove', (event) => {
-
+canvas.addEventListener('mousemove', function() 
+{
     if (!mousedown)
     {
         wasDown = false
         return
-    } else if (!wasDown)
-    {
-        wasDown = true
-        xMouse = window.event.clientX / sensitivity
-        yMouse = window.event.clientY / sensitivity
-    }
+    } 
+    clientX += event.movementX
+    clientY += event.movementY
 
-    xMouse -= window.event.clientX / sensitivity
-    yMouse -= window.event.clientY / sensitivity
+    xMouse -= clientX / sensitivity
+    yMouse -= clientY / sensitivity
 
     xTo += xMouse
     xFrom += xMouse
@@ -39,8 +37,8 @@ canvas.addEventListener('mousemove', (event) => {
 
     draw()
 
-    xMouse = window.event.clientX / sensitivity
-    yMouse = window.event.clientY / sensitivity
+    xMouse = clientX / sensitivity
+    yMouse = clientY / sensitivity
 })
 
 // This method is called at program start and anytime the size of the window changes, redrawing the entire program onto screen.
