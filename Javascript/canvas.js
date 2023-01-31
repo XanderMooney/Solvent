@@ -52,7 +52,6 @@ function screenResize() {
 function draw() {
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
-    ctx.font = "24px serif"
 
     lineSpacing = 2//canvas.width * scale / lineGap
 
@@ -74,12 +73,15 @@ function draw() {
         ctx.stroke()
 
         if (yFrom > 0) {
-            ctx.fillText(i, xScreenPos(i), canvas.height - 25)
+            ctx.font = "18px serif"
+            ctx.fillText(i, xScreenPos(i), canvas.height - 20)
         }
         else if (yTo < 0) {
-            ctx.fillText(i, xScreenPos(i), 25)
+            ctx.font = "18px serif"
+            ctx.fillText(i, xScreenPos(i), 20)
         }
         else {
+            ctx.font = "24px serif"
             ctx.fillText(i, xScreenPos(i), yScreenPos(0))
         }
     }
@@ -102,12 +104,15 @@ function draw() {
         ctx.stroke()
 
         if (xFrom > 0) {
-            ctx.fillText(i, 25, yScreenPos(i))
+            ctx.font = "18px serif"
+            ctx.fillText(i, 20, yScreenPos(i))
         }
         else if (xTo < 0) {
-            ctx.fillText(i, canvas.width - 25, yScreenPos(i))
+            ctx.font = "18px serif"
+            ctx.fillText(i, canvas.width - 20, yScreenPos(i))
         }
         else {
+            ctx.font = "24px serif"
             ctx.fillText(i, xScreenPos(0), yScreenPos(i))
         }
     }
