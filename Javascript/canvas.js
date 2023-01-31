@@ -15,7 +15,8 @@ addEventListener('resize', screenResize)
 
 // Change the scale whenever the user uses the mousewheel
 addEventListener('wheel', function (event) {
-    scale += event.deltaY * -0.01
+    scale += event.deltaY * -0.001
+    draw()
 })
 
 canvas.addEventListener('mousedown', function () { mousedown = true })
