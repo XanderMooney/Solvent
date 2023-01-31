@@ -60,7 +60,13 @@ function draw() {
         if (i % lineSpacing != 0) {
             continue
         }
-        i != 0 ? ctx.strokeStyle = '#848484' : ctx.strokeStyle = '#000000'
+        if (i != 0) {
+            ctx.lineWidth = 1
+            ctx.strokeStyle = '#848484'
+        } else {
+            ctx.lineWidth = 2
+            ctx.strokeStyle = '#000000'
+        }
 
         ctx.beginPath()
         ctx.moveTo(xScreenPos(i), 0)
@@ -82,7 +88,13 @@ function draw() {
         if (i % lineSpacing != 0) {
             continue
         }
-        i != 0 ? ctx.strokeStyle = '#848484' : ctx.strokeStyle = '#000000'
+        if (i != 0) {
+            ctx.lineWidth = 1
+            ctx.strokeStyle = '#848484'
+        } else {
+            ctx.lineWidth = 2
+            ctx.strokeStyle = '#000000'
+        }
 
         ctx.beginPath()
         ctx.moveTo(0, yScreenPos(i))
