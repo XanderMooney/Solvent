@@ -17,16 +17,29 @@ addEventListener('resize', screenResize)
 
 var localScale = 1;
 
+const SCALAR = 75
+
+var calculatedScale = 1; // default scale is 20/20
+
 // Change the scale whenever the user uses the mousewheel
 addEventListener('wheel', function (event) {
-    localScale = event.deltaY * 0.001
+    localScale += event.deltaY
+    
+    scale = localScale / 1000
 
-    scale = localScale
+    var deltaY = event.deltaY;
 
-    xTo += localScale
-    xFrom -= localScale
-    yTo += localScale
-    yFrom -= localScale
+    if (event.deltaY < 0) { // scrolling in
+        xTo += event.deltaY / SCALAR;
+        xFrom -= event.deltaY / SCALAR;
+    }
+    else { // scrolling out
+        xTo += event.deltaY / SCALAR;
+        xFrom -= event.deltaY / SCALAR;
+    }
+
+    calculatedScale = Math.abs(xTo - xFrom) / 20; // always calculate so other functions can use
+
     screenResize()
 })
 
@@ -46,12 +59,12 @@ canvas.addEventListener('mousemove', function (event) {
     xMouse -= clientX * sensitivity
     yMouse -= clientY * sensitivity
 
-    // multiply by scale so we still move at a consistent pace nomatter how big or small the grid is
-    xTo += xMouse * Math.abs(scale)
-    xFrom += xMouse * Math.abs(scale)
+    // multiply by calculatedScale so we still move at a consistent pace nomatter how big or small the grid is
+    xTo += xMouse * Math.abs(calculatedScale)
+    xFrom += xMouse * Math.abs(calculatedScale)
     // we subtract with the Y-Axis as the Y-Axis is drawn reverse of the X-Axis
-    yTo -= yMouse * Math.abs(scale)
-    yFrom -= yMouse * Math.abs(scale)
+    yTo -= yMouse * Math.abs(calculatedScale)
+    yFrom -= yMouse * Math.abs(calculatedScale)
 
     draw()
 
@@ -73,7 +86,7 @@ function draw() {
 
     lineSpacing = Math.floor((Math.floor(xTo) - Math.floor(xFrom)) / 10)
   
-  console.log(lineSpacing)
+    console.log(lineSpacing)
 
     while (lineSpacing % 5 != 0 && lineSpacing != 2 && lineSpacing != 1)
     {
@@ -98,16 +111,16 @@ function draw() {
         ctx.stroke()
 
         if (yFrom > 0) {
-            ctx.font = "18px serif"
+            ctx.font = "18px sans-serif"
            // ctx.fillRect(xScreenPos(i), canvas.height - 20, 20, 20 )
             ctx.fillText(i, xScreenPos(i), canvas.height - 20)
         }
         else if (yTo < 0) {
-            ctx.font = "18px serif"
+            ctx.font = "18px sans-serif"
             ctx.fillText(i, xScreenPos(i), 20)
         }
         else {
-            ctx.font = "24px serif"
+            ctx.font = "24px sans-serif"
             ctx.fillText(i, xScreenPos(i), yScreenPos(0))
         }
     }
@@ -129,15 +142,15 @@ function draw() {
         ctx.stroke()
 
         if (xFrom > 0) {
-            ctx.font = "18px serif"
+            ctx.font = "18px sans-serif"
             ctx.fillText(i, 20, yScreenPos(i))
         }
         else if (xTo < 0) {
-            ctx.font = "18px serif"
+            ctx.font = "18px sans-serif"
             ctx.fillText(i, canvas.width - 20, yScreenPos(i))
         }
         else {
-            ctx.font = "24px serif"
+            ctx.font = "24px sans-serif"
             ctx.fillText(i, xScreenPos(0), yScreenPos(i))
         }
     }
