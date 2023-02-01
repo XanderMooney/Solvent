@@ -15,15 +15,19 @@ screenResize()
 var yFrom = -10 / aspectRatio, yTo = 10 / aspectRatio
 addEventListener('resize', screenResize)
 
+var localScale = 1;
+
 // Change the scale whenever the user uses the mousewheel
 addEventListener('wheel', function (event) {
-    scale += event.deltaY * 0.001
+    localScale = event.deltaY * 0.001
 
-    xTo += event.deltaY * 0.001
-    xFrom -= event.deltaY * 0.001
-    yTo += event.deltaY * 0.001
-    yFrom -= event.deltaY * 0.001
-    draw()
+    scale = localScale
+
+    xTo += localScale
+    xFrom -= localScale
+    yTo += localScale
+    yFrom -= localScale
+    screenResize()
 })
 
 // two events to tell if we have the mouse pressed down
@@ -35,12 +39,14 @@ canvas.addEventListener('mousemove', function (event) {
     if (!mousedown) {
         return
     }
+
     clientX += event.movementX
     clientY += event.movementY
 
     xMouse -= clientX * sensitivity
     yMouse -= clientY * sensitivity
 
+    // multiply by scale so we still move at a consistent pace nomatter how big or small the grid is
     xTo += xMouse * Math.abs(scale)
     xFrom += xMouse * Math.abs(scale)
     // we subtract with the Y-Axis as the Y-Axis is drawn reverse of the X-Axis
@@ -49,10 +55,12 @@ canvas.addEventListener('mousemove', function (event) {
 
     draw()
 
+    // set the mouse position for next frame
     xMouse = clientX * sensitivity
     yMouse = clientY * sensitivity
 })
 
+// uses the aspect ratio of the users screen to make the grid out of squares
 function screenResize() {
     aspectRatio = window.innerWidth / window.innerHeight
     yFrom = xFrom / aspectRatio, yTo = xTo / aspectRatio
@@ -64,6 +72,8 @@ function draw() {
     canvas.height = window.innerHeight
 
     lineSpacing = Math.floor((Math.floor(xTo) - Math.floor(xFrom)) / 10)
+  
+  console.log(lineSpacing)
 
     while (lineSpacing % 5 != 0 && lineSpacing != 2 && lineSpacing != 1)
     {
@@ -78,7 +88,7 @@ function draw() {
             ctx.lineWidth = 1
             ctx.strokeStyle = '#848484'
         } else {
-            ctx.lineWidth = 2
+            ctx.lineWidth = 1.25
             ctx.strokeStyle = '#000000'
         }
 
@@ -89,6 +99,7 @@ function draw() {
 
         if (yFrom > 0) {
             ctx.font = "18px serif"
+           // ctx.fillRect(xScreenPos(i), canvas.height - 20, 20, 20 )
             ctx.fillText(i, xScreenPos(i), canvas.height - 20)
         }
         else if (yTo < 0) {
@@ -108,7 +119,7 @@ function draw() {
             ctx.lineWidth = 1
             ctx.strokeStyle = '#848484'
         } else {
-            ctx.lineWidth = 2
+            ctx.lineWidth = 1.25
             ctx.strokeStyle = '#000000'
         }
 
