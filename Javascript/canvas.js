@@ -15,30 +15,29 @@ screenResize()
 var yFrom = -10 / aspectRatio, yTo = 10 / aspectRatio
 addEventListener('resize', screenResize)
 
-var localScale = 1;
+var rawScale = 1;
 
-const SCALAR = 75
+const SCALAR = 0.01
 
 var calculatedScale = 1; // default scale is 20/20
 
+// clear display
+document.getElementById("display").innerHTML = ""
+
 // Change the scale whenever the user uses the mousewheel
 addEventListener('wheel', function (event) {
-    localScale += event.deltaY
-    
-    scale = localScale / 1000
-
-    var deltaY = event.deltaY;
+    let deltaY = event.deltaY * Math.sqrt(Math.abs(xTo - xFrom) / 20) * SCALAR;
 
     if (event.deltaY < 0) { // scrolling in
-        xTo += event.deltaY / SCALAR;
-        xFrom -= event.deltaY / SCALAR;
+        xTo += deltaY
+        xFrom -= deltaY
     }
     else { // scrolling out
-        xTo += event.deltaY / SCALAR;
-        xFrom -= event.deltaY / SCALAR;
+        xTo += deltaY
+        xFrom -= deltaY
     }
 
-    calculatedScale = Math.abs(xTo - xFrom) / 20; // always calculate so other functions can use
+    calculatedScale = Math.abs(xTo - xFrom) / 20; // calculate so we can use
 
     screenResize()
 })
@@ -59,6 +58,8 @@ canvas.addEventListener('mousemove', function (event) {
     xMouse -= clientX * sensitivity
     yMouse -= clientY * sensitivity
 
+    calculatedScale = Math.abs(xTo - xFrom) / 20; // always calculate so other functions can use
+
     // multiply by calculatedScale so we still move at a consistent pace nomatter how big or small the grid is
     xTo += xMouse * Math.abs(calculatedScale)
     xFrom += xMouse * Math.abs(calculatedScale)
@@ -69,8 +70,8 @@ canvas.addEventListener('mousemove', function (event) {
     draw()
 
     // set the mouse position for next frame
-    xMouse = clientX * sensitivity
-    yMouse = clientY * sensitivity
+    xMouse = clientX * sensitivity //??????
+    yMouse = clientY * sensitivity //??????
 })
 
 // uses the aspect ratio of the users screen to make the grid out of squares
@@ -79,6 +80,15 @@ function screenResize() {
     yFrom = xFrom / aspectRatio, yTo = xTo / aspectRatio
     draw()
 }
+
+// event for clicking the "home" button
+function home() {
+    xFrom = -10 // default xFrom
+    xTo = 10 // default xTo
+    screenResize() // auto resize yTo and yFrom
+    calculatedScale = Math.abs(xTo - xFrom) / 20; // recalculate scale
+}
+
 // This method is called at program start and anytime the lineSpacing of the window changes, redrawing the entire program onto screen.
 function draw() {
     canvas.width = window.innerWidth
@@ -112,7 +122,7 @@ function draw() {
 
         if (yFrom > 0) {
             ctx.font = "18px sans-serif"
-           // ctx.fillRect(xScreenPos(i), canvas.height - 20, 20, 20 )
+            // ctx.fillRect(xScreenPos(i), canvas.height - 20, 20, 20 )
             ctx.fillText(i, xScreenPos(i), canvas.height - 20)
         }
         else if (yTo < 0) {
@@ -168,3 +178,5 @@ function yScreenPos(num) {
 function screenPos(xNum, yNum) {
     return (xScreenPos(xNum), yScreenPos(yNum))
 }
+
+//document.getElementById("display").innerText = "replaceme"

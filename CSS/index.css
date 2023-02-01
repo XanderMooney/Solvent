@@ -1,19 +1,60 @@
-body {
-    margin: auto;
-    padding: auto;
-    border:auto;
-    width: 100vw;
-    height: 100vh;
-    /* Current underlying issue is that even though the canvas is smart and adjusts to the scale of your window, it is just the tiniest bit big and caused overflow */
-    overflow: hidden;
-}
-canvas {
-    background-color: rgb(255, 255, 255);
-    overflow: hidden;
+:root {
+    --margin: 0.5rem; /* margin for every element to be displayed on top of the canvas */
 }
 
-div {
-    width: 5rem;
-    height: 5rem;
-    background-color: orange;
+body, html {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+}
+
+* {
+    font-family: sans-serif; /* desmos font */
+}
+
+canvas {
+    position:fixed;
+    background-color: rgb(255, 255, 255);
+    width: 100%;
+    height: 100%;
+}
+
+#homeButton {
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin: var(--margin);
+
+    aspect-ratio: 1;
+    
+    z-index: 1; /* display in front of other elements */
+}
+
+p {
+    position: relative;
+    left: 0;
+    top: 0;
+    margin: var(--margin);
+
+    z-index: 1; /* display in front of other elements */
+}
+
+input {
+    position: relative;
+    left: 0;
+    top: 0;
+    margin: var(--margin);
+    margin-right: 0;
+
+    z-index: 1; /* display in front of other elements */
+}
+
+#graphIt {
+    position: relative;
+    left: 0;
+    top: 0;
+    margin: var(--margin); /* --margin units from the edge */
+    margin-left: 0;
+
+    z-index: 1; /* display in front of other elements */
 }
