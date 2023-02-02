@@ -21,6 +21,8 @@ var rawScale = 1;
 
 const SCALAR = 0.01
 
+var points = null
+
 var calculatedScale = 1; // default scale is 20/20
 
 // clear display
@@ -42,6 +44,13 @@ addEventListener('wheel', function (event) {
     calculatedScale = Math.abs(xTo - xFrom) / 20; // calculate so we can use
 
     screenResize()
+
+    try {
+        graph(true)
+    }
+    catch {
+        // nothing
+    }
 })
 
 // two events to tell if we have the mouse pressed down
@@ -69,6 +78,13 @@ canvas.addEventListener('mousemove', function (event) {
     yTo -= yMouse * Math.abs(calculatedScale)
     yFrom -= yMouse * Math.abs(calculatedScale)
 
+    try {
+        graph(true)
+    }
+    catch {
+        // nothing
+    }
+
     draw()
 
     // set the mouse position for next frame
@@ -89,6 +105,12 @@ function home() {
     xTo = 10 // default xTo
     screenResize() // auto resize yTo and yFrom
     calculatedScale = Math.abs(xTo - xFrom) / 20; // recalculate scale
+    try {
+        graph(false)
+    }
+    catch {
+        // nothing
+    }
 }
 
 // This method is called at program start and anytime the lineSpacing of the window changes, redrawing the entire program onto screen.
@@ -166,6 +188,8 @@ function draw() {
             ctx.fillText(i, xScreenPos(0), yScreenPos(i))
         }
     }
+
+    drawPoints();
 }
 
 // global method to convert from our built in numbers to screen numbers
@@ -191,7 +215,20 @@ function execute() {
     display(out + "<br>will be sent to graph()");
 }
 
-function graph() {
+function drawPoints() {
+    if (points != null) {
+        for (let i = 1; i < points.length; i++) {
+            ctx.beginPath();
+            ctx.strokeStyle = "dodgerBlue"
+            ctx.lineWidth = 3
+            ctx.moveTo(xScreenPos(points[i - 1].x), yScreenPos(points[i - 1].y))
+            ctx.lineTo(xScreenPos(points[i].x), yScreenPos(points[i].y))
+            ctx.stroke();
+        }
+    }
+}
+
+function graph(draw = true) {
     var input = document.getElementById("input").value
 
     /*let out = eval(Function("return " + input) + "; anonymous();");*/
@@ -235,24 +272,18 @@ function graph() {
         }
 
         points.push({
-            x: xScreenPos(x),
-            y: yScreenPos(out)
+            x: x,
+            y: out
           //xScreenPos(x), yScreenPos(out)
         })
     }
 
-    for (let i = 1; i < points.length; i++) {
-       console.log(points[i].x + ", " + points[i].y)
-        ctx.beginPath();
-      ctx.strokeStyle = "dodgerBlue"
-    ctx.lineWidth = 3
-        ctx.moveTo(points[i - 1].x, points[i - 1].y)
-        ctx.lineTo(points[i].x, points[i].y)
-        ctx.stroke();
+    if (draw) {
+        drawPoints();
     }
-
-    ctx.stroke();
 }
+
+
 
 function display(text) {
     document.getElementById("display").innerHTML = text
