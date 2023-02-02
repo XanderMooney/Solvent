@@ -94,8 +94,8 @@ canvas.addEventListener('mousemove', function (event) {
     draw()
 
     // set the mouse position for next frame
-    xMouse = clientX * sensitivity //??????
-    yMouse = clientY * sensitivity //??????
+    xMouse = clientX * sensitivity
+    yMouse = clientY * sensitivity
 })
 
 // uses the aspect ratio of the users screen to make the grid out of squares
@@ -106,6 +106,15 @@ function screenResize() {
 
     yFrom = graphY - yDist
     yTo = graphY + yDist
+
+    lineSpacing = Math.floor((Math.floor(xTo) - Math.floor(xFrom)) / 10)
+
+    let leftDigit = Math.floor(lineSpacing / (10 ** (lineSpacing.toString().length - 1)))
+    
+    if (leftDigit > 5) { leftDigit = 5}
+    else if (leftDigit > 2) {leftDigit = 2}
+
+    lineSpacing = (10 ** (lineSpacing.toString().length - 1)) * leftDigit
 
     draw()
 }
@@ -129,18 +138,8 @@ function draw() {
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
 
-    lineSpacing = Math.floor((Math.floor(xTo) - Math.floor(xFrom)) / 10)
-
-    let leftDigit = Math.floor(lineSpacing / (10 ** (lineSpacing.toString().length - 1)))
-    if (leftDigit > 5) { leftDigit = 5}
-    else if (leftDigit > 2) {leftDigit = 2}
-
-    lineSpacing = (10 ** (lineSpacing.toString().length - 1)) * leftDigit
-
-    for (let i = Math.floor(xFrom) + 1; i < xTo; ++i) {
-        if (i % lineSpacing != 0) {
-            continue
-        }
+    for (let i = xFrom - (xFrom % lineSpacing); i < xTo; i += lineSpacing) {
+        
         if (i != 0) {
             ctx.lineWidth = 1
             ctx.strokeStyle = '#848484'
@@ -155,23 +154,21 @@ function draw() {
         ctx.stroke()
 
         if (yFrom > 0) {
-            ctx.font = "18px sans-serif"
+            ctx.font = "12px sans-serif"
             // ctx.fillRect(xScreenPos(i), canvas.height - 20, 20, 20 )
             ctx.fillText(i, xScreenPos(i), canvas.height - 20)
         }
         else if (yTo < 0) {
-            ctx.font = "18px sans-serif"
+            ctx.font = "12px sans-serif"
             ctx.fillText(i, xScreenPos(i), 20)
         }
         else {
-            ctx.font = "24px sans-serif"
+            ctx.font = "18px sans-serif"
             ctx.fillText(i, xScreenPos(i), yScreenPos(0))
         }
     }
-    for (let i = Math.floor(yFrom) + 1; i < yTo; ++i) {
-        if (i % lineSpacing != 0) {
-            continue
-        }
+
+    for (let i = yFrom - (yFrom % lineSpacing); i < yTo; i += lineSpacing) {
         if (i != 0) {
             ctx.lineWidth = 1
             ctx.strokeStyle = '#848484'
@@ -186,15 +183,15 @@ function draw() {
         ctx.stroke()
 
         if (xFrom > 0) {
-            ctx.font = "18px sans-serif"
+            ctx.font = "12px sans-serif"
             ctx.fillText(i, 20, yScreenPos(i))
         }
         else if (xTo < 0) {
-            ctx.font = "18px sans-serif"
+            ctx.font = "12px sans-serif"
             ctx.fillText(i, canvas.width - 20, yScreenPos(i))
         }
         else {
-            ctx.font = "24px sans-serif"
+            ctx.font = "18px sans-serif"
             ctx.fillText(i, xScreenPos(0), yScreenPos(i))
         }
     }
