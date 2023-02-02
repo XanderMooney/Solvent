@@ -130,13 +130,12 @@ function draw() {
     canvas.height = window.innerHeight
 
     lineSpacing = Math.floor((Math.floor(xTo) - Math.floor(xFrom)) / 10)
-  
-    //console.log(lineSpacing)
 
-    while (lineSpacing % 5 != 0 && lineSpacing != 2 && lineSpacing != 1)
-    {
-        --lineSpacing
-    }
+    let leftDigit = Math.floor(lineSpacing / (10 ** (lineSpacing.toString().length - 1)))
+    if (leftDigit > 5) { leftDigit = 5}
+    else if (leftDigit > 2) {leftDigit = 2}
+
+    lineSpacing = (10 ** (lineSpacing.toString().length - 1)) * leftDigit
 
     for (let i = Math.floor(xFrom) + 1; i < xTo; ++i) {
         if (i % lineSpacing != 0) {
