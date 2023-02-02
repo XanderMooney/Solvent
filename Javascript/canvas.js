@@ -10,6 +10,8 @@ var clientX = 0, clientY = 0
 var lineSpacing = 2
 var aspectRatio = 1;
 
+const RES = 0.01;
+
 screenResize()
 
 var yFrom = -10 / aspectRatio, yTo = 10 / aspectRatio
@@ -96,7 +98,7 @@ function draw() {
 
     lineSpacing = Math.floor((Math.floor(xTo) - Math.floor(xFrom)) / 10)
   
-    console.log(lineSpacing)
+    //console.log(lineSpacing)
 
     while (lineSpacing % 5 != 0 && lineSpacing != 2 && lineSpacing != 1)
     {
@@ -179,4 +181,83 @@ function screenPos(xNum, yNum) {
     return (xScreenPos(xNum), yScreenPos(yNum))
 }
 
-//document.getElementById("display").innerText = "replaceme"
+function execute() {
+    var input = document.getElementById("debugInput").value
+
+    display("error parsing \"" + input + "\" ! nothing will get passed to graph()! check ur JS m8!");
+
+    let out = Function("return " + input)
+
+    display(out + "<br>will be sent to graph()");
+}
+
+function graph() {
+    var input = document.getElementById("input").value
+
+    /*let out = eval(Function("return " + input) + "; anonymous();");*/
+
+    var inputSplit = input.split("y=")[1].split('');
+
+    var vars = []
+
+    var returnValue = ""
+
+    for (let i = 0; i < inputSplit.length; i++) {
+        if (isLetter(inputSplit[i])) {
+            vars.push({
+                index: i,
+                var: inputSplit[i]
+            })
+        }
+
+        returnValue += inputSplit[i];
+    }
+
+    var params = "unused";
+
+    for (let i = 0; i < vars.length; i++) {
+        params += ", " + vars[i].var;
+    }
+
+    var assembledFunction = "function anonymous(" + params + ") { return " + returnValue + "}" + "; anonymous("
+    
+    //console.log(assembledFunction)
+
+    let res = RES * calculatedScale;
+
+    points = []
+
+    for (let x = xFrom; x < xTo; x += res) {
+        var out = eval(assembledFunction + "0, " + x + ")");
+      
+        if (out < yFrom || out > yTo) {
+          continue;
+        }
+
+        points.push({
+            x: xScreenPos(x),
+            y: yScreenPos(out)
+          //xScreenPos(x), yScreenPos(out)
+        })
+    }
+
+    for (let i = 1; i < points.length; i++) {
+       console.log(points[i].x + ", " + points[i].y)
+        ctx.beginPath();
+      ctx.strokeStyle = "dodgerBlue"
+    ctx.lineWidth = 3
+        ctx.moveTo(points[i - 1].x, points[i - 1].y)
+        ctx.lineTo(points[i].x, points[i].y)
+        ctx.stroke();
+    }
+
+    ctx.stroke();
+}
+
+function display(text) {
+    document.getElementById("display").innerHTML = text
+}
+
+function isLetter(str) {
+  return str.length === 1 && str.match(/[a-z]/i);
+}
