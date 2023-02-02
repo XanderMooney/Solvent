@@ -12,10 +12,12 @@ var aspectRatio = 1;
 
 const RES = 0.01;
 
-screenResize()
-
 var yFrom = -10 / aspectRatio, yTo = 10 / aspectRatio
 addEventListener('resize', screenResize)
+
+var graphY = 0;
+
+screenResize()
 
 var rawScale = 1;
 
@@ -78,6 +80,10 @@ canvas.addEventListener('mousemove', function (event) {
     yTo -= yMouse * Math.abs(calculatedScale)
     yFrom -= yMouse * Math.abs(calculatedScale)
 
+    graphY -= yMouse * Math.abs(calculatedScale)
+    
+    display(graphY)
+
     try {
         graph(true)
     }
@@ -95,7 +101,12 @@ canvas.addEventListener('mousemove', function (event) {
 // uses the aspect ratio of the users screen to make the grid out of squares
 function screenResize() {
     aspectRatio = window.innerWidth / window.innerHeight
-    yFrom = xFrom / aspectRatio, yTo = xTo / aspectRatio
+
+    yDist = (xTo / aspectRatio - xFrom / aspectRatio) / 2
+
+    yFrom = graphY - yDist
+    yTo = graphY + yDist
+
     draw()
 }
 
@@ -282,8 +293,6 @@ function graph(draw = true) {
         drawPoints();
     }
 }
-
-
 
 function display(text) {
     document.getElementById("display").innerHTML = text
