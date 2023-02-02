@@ -201,11 +201,11 @@ function draw() {
 
 // global method to convert from our built in numbers to screen numbers
 function xScreenPos(num) {
-    return canvas.width * (Math.abs((num - xFrom) / (xFrom - xTo)))
+    return canvas.width * -((num - xFrom) / (xFrom - xTo))
 }
 // global method to convert from our built in numbers to screen numbers; the Y-axis is drawn reverse of the X-Axis
 function yScreenPos(num) {
-    return canvas.height * (Math.abs((num - yTo) / (yTo - yFrom)))
+    return canvas.height * -((num - yTo) / (yTo - yFrom))
 }
 // easier function that uses both X and Y
 function screenPos(xNum, yNum) {
