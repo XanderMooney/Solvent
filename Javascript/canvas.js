@@ -87,6 +87,9 @@ var temp = 0;
 
 // uses the aspect ratio of the users screen to make the grid out of squares
 function screenResize() {
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
+
     aspectRatio = window.innerWidth / window.innerHeight
 
     // calculate vertical graph bounds
@@ -108,10 +111,10 @@ function screenResize() {
     lineSpacing = xDist / 5
 
     temp = 0;
-    while (!Number.isInteger(lineSpacing))
+    if (!Number.isInteger(lineSpacing))
     {
-        lineSpacing *= 10
-        temp++
+        temp = lineSpacing.toString().split('.')[1].length;
+        lineSpacing *= 10 ** temp
     }
     
     let leftDigit = Math.trunc(lineSpacing / (10 ** (lineSpacing.toString().length - 1)))
@@ -150,9 +153,6 @@ function home() {
 
 // This method is called at program start and anytime the lineSpacing of the window changes, redrawing the entire program onto screen.
 function draw() {
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
-
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     for (let i = xFrom - (xFrom % lineSpacing); i < xTo; i += lineSpacing) {
@@ -174,7 +174,6 @@ function draw() {
 
         if (yFrom > 0) {
             ctx.font = "12px sans-serif"
-            // ctx.fillRect(xScreenPos(i), canvas.height - 20, 20, 20 )
             ctx.fillText(fixed_i, xScreenPos(i), canvas.height - 20)
         }
         else if (yTo < 0) {
