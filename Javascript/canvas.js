@@ -4,6 +4,7 @@ var ctx = canvas.getContext('2d')
 //#region Constants
 
 const TEXT_DISPLAY = document.getElementById("display")
+const INPUT = document.getElementById("input")
 
 const SENSITIVITY = 0.015
 const RES = 0.01
@@ -27,19 +28,19 @@ var rawScale = DEFAULT_RAW_SCALE;
 
 var points = null // points to draw
 
-////#endregion initilize variables
+//#endregion initilize variables
 
 addEventListener('resize', screenResize)
 
 screenResize()
 
-display("") // reset display
+display("") // clear display (if this code does not run we will know, as the display has default text)
 
 // Change the scale whenever the user uses the mousewheel
 addEventListener('wheel', function (event) {
-    
+
     rawScale += event.deltaY;
-    
+
     screenResize()
 
     try {
@@ -98,7 +99,7 @@ function screenResize() {
     lineSpacing = Math.trunc((Math.trunc(xTo) - Math.trunc(xFrom)) / 10)
 
     let leftDigit = Math.trunc(lineSpacing / (10 ** (lineSpacing.toString().length - 1)))
-    
+
     if (leftDigit > 5) {
         leftDigit = 5
     } else if (leftDigit > 2) {
@@ -134,8 +135,10 @@ function draw() {
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
 
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
     for (let i = xFrom - (xFrom % lineSpacing); i < xTo; i += lineSpacing) {
-        
+
         if (i != 0) {
             ctx.lineWidth = 1
             ctx.strokeStyle = '#848484'
@@ -192,6 +195,7 @@ function draw() {
         }
     }
 
+    // draw existing points
     drawPoints();
 }
 
@@ -208,79 +212,62 @@ function screenPos(xNum, yNum) {
     return (xScreenPos(xNum), yScreenPos(yNum))
 }
 
-function execute() {
-    var input = document.getElementById("debugInput").value
-
-    display("error parsing \"" + input + "\" ! nothing will get passed to graph()! check ur JS m8!");
-
-    let out = Function("return " + input)
-
-    display(out + "<br>will be sent to graph()");
-}
-
 function drawPoints() {
-    if (points != null) {
-        for (let i = 1; i < points.length; i++) {
-            ctx.beginPath();
-            ctx.strokeStyle = "dodgerBlue"
-            ctx.lineWidth = 3
-            ctx.moveTo(xScreenPos(points[i - 1].x), yScreenPos(points[i - 1].y))
-            ctx.lineTo(xScreenPos(points[i].x), yScreenPos(points[i].y))
-            ctx.stroke();
-        }
+    if (points == null) {
+        return; // return if points are empty
     }
+
+    ctx.beginPath(); // begin drawing
+
+    ctx.strokeStyle = "dodgerBlue" // blue lines
+    ctx.lineWidth = 3 // wide lines
+
+    ctx.moveTo(xScreenPos(points[0].x), yScreenPos(points[0].y)) // move to first point
+
+    // starting at the second point, draw the entire function
+    for (let i = 1; i < points.length; i++) {
+        ctx.lineTo(xScreenPos(points[i].x), yScreenPos(points[i].y))
+    }
+
+    ctx.stroke();
 }
 
-function graph(draw = true) {
-    var input = document.getElementById("input").value
+function graph(graphPoints = true, restrictToViewport = false) {
+    let input = INPUT.value.replace(/y=/i, "");
 
-    var inputSplit = input.split("y=")[1].split('');
-
-    var vars = []
-
-    var returnValue = ""
-
-    for (let i = 0; i < inputSplit.length; i++) {
-        if (isLetter(inputSplit[i])) {
-            vars.push({
-                index: i,
-                var: inputSplit[i]
-            })
-        }
-
-        returnValue += inputSplit[i];
-    }
-
-    var params = "unused";
-
-    for (let i = 0; i < vars.length; i++) {
-        params += ", " + vars[i].var;
-    }
-
-    var assembledFunction = "function anonymous(" + params + ") { return " + returnValue + "}" + "; anonymous("
-    
-    //console.log(assembledFunction)
+    input = input.replace("**", "^")
 
     let res = RES * rawScale;
 
     points = []
 
-    for (let x = xFrom; x < xTo; x += res) {
-        var out = eval(assembledFunction + "0, " + x + ")");
-      
-        if (out < yFrom || out > yTo) {
-          continue; // dont draw points outside of the viewport
-        }
+    if (restrictToViewport) {
+        for (let x = xFrom; x < xTo; x += res) {
 
-        points.push({
-            x: x,
-            y: out
-          //xScreenPos(x), yScreenPos(out)
-        })
+            let out = math.compile(input).evaluate({ x: x })
+
+            if (out < yFrom || out > yTo) {
+                continue; // dont draw points outside of the viewport
+            }
+
+            points.push({
+                x: x,
+                y: out
+            })
+        }
+    }
+    else {
+        for (let x = xFrom; x < xTo; x += res) {
+            points.push({
+                x: x,
+                y: math.compile(input).evaluate({ x: x })
+            })
+        }
     }
 
-    if (draw) {
-        drawPoints();
+
+    if (graphPoints) {
+        draw();
     }
 }
 
@@ -289,5 +276,5 @@ function display(text) {
 }
 
 function isLetter(str) {
-  return str.length === 1 && str.match(/[a-z]/i);
+    return str.match(/[a-z]/i);
 }
