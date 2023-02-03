@@ -83,6 +83,8 @@ canvas.addEventListener('mousemove', function (event) {
     screenResize()
 })
 
+var temp = 0;
+
 // uses the aspect ratio of the users screen to make the grid out of squares
 function screenResize() {
     aspectRatio = window.innerWidth / window.innerHeight
@@ -105,7 +107,7 @@ function screenResize() {
 
     lineSpacing = xDist / 5
 
-    let temp = 0;
+    temp = 0;
     while (!Number.isInteger(lineSpacing))
     {
         lineSpacing *= 10
@@ -168,18 +170,20 @@ function draw() {
         ctx.lineTo(xScreenPos(i), canvas.height)
         ctx.stroke()
 
+        fixed_i = fixFloat(i)
+
         if (yFrom > 0) {
             ctx.font = "12px sans-serif"
             // ctx.fillRect(xScreenPos(i), canvas.height - 20, 20, 20 )
-            ctx.fillText(i, xScreenPos(i), canvas.height - 20)
+            ctx.fillText(fixed_i, xScreenPos(i), canvas.height - 20)
         }
         else if (yTo < 0) {
             ctx.font = "12px sans-serif"
-            ctx.fillText(i, xScreenPos(i), 20)
+            ctx.fillText(fixed_i, xScreenPos(i), 20)
         }
         else {
             ctx.font = "18px sans-serif"
-            ctx.fillText(i, xScreenPos(i), yScreenPos(0))
+            ctx.fillText(fixed_i, xScreenPos(i), yScreenPos(0))
         }
     }
 
@@ -197,17 +201,19 @@ function draw() {
         ctx.lineTo(canvas.width, yScreenPos(i))
         ctx.stroke()
 
+        fixed_i = fixFloat(i)
+
         if (xFrom > 0) {
             ctx.font = "12px sans-serif"
-            ctx.fillText(i, 20, yScreenPos(i))
+            ctx.fillText(fixed_i, 20, yScreenPos(i))
         }
         else if (xTo < 0) {
             ctx.font = "12px sans-serif"
-            ctx.fillText(i, canvas.width - 20, yScreenPos(i))
+            ctx.fillText(fixed_i, canvas.width - 20, yScreenPos(i))
         }
         else {
             ctx.font = "18px sans-serif"
-            ctx.fillText(i, xScreenPos(0), yScreenPos(i))
+            ctx.fillText(fixed_i, xScreenPos(0), yScreenPos(i))
         }
     }
 
@@ -303,4 +309,8 @@ function display(text) {
 
 function isLetter(str) {
     return str.match(/[a-z]/i);
+}
+
+function fixFloat(number) {
+    return (parseFloat(number.toPrecision(12)));
 }
