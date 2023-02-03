@@ -95,9 +95,9 @@ function screenResize() {
 
     //#region Calculate Line Spacing
 
-    lineSpacing = Math.floor((Math.floor(xTo) - Math.floor(xFrom)) / 10)
+    lineSpacing = Math.trunc((Math.trunc(xTo) - Math.trunc(xFrom)) / 10)
 
-    let leftDigit = Math.floor(lineSpacing / (10 ** (lineSpacing.toString().length - 1)))
+    let leftDigit = Math.trunc(lineSpacing / (10 ** (lineSpacing.toString().length - 1)))
     
     if (leftDigit > 5) {
         leftDigit = 5
