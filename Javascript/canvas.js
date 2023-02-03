@@ -6,7 +6,8 @@ var ctx = canvas.getContext('2d')
 const TEXT_DISPLAY = document.getElementById("display")
 const INPUT = document.getElementById("input")
 
-const SENSITIVITY = 0.015
+const MOUSE_SENSITIVITY = 0.015
+const SCROLL_SENSITIVITY = 0.01
 const RES = 0.01
 const DEFAULT_RAW_SCALE = 4.5
 
@@ -24,6 +25,8 @@ var aspectRatio = 1
 
 var graphX = DEFAULT_GRAPH_X;
 var graphY = DEFAULT_GRAPH_Y;
+var graphScale = DEFAULT_RAW_SCALE;
+
 var rawScale = DEFAULT_RAW_SCALE;
 
 var points = null // points to draw
@@ -36,10 +39,14 @@ screenResize()
 
 display("") // clear display (if this code does not run we will know, as the display has default text)
 
+home() // run home for coord display
+
 // Change the scale whenever the user uses the mousewheel
 addEventListener('wheel', function (event) {
 
-    rawScale += event.deltaY;
+    rawScale += event.deltaY * SCROLL_SENSITIVITY;
+
+    calculateGraphScale()
 
     screenResize()
 
@@ -61,7 +68,7 @@ canvas.addEventListener('mousemove', function (event) {
         return
     }
 
-    let scaleMovement = (rawScale / DEFAULT_RAW_SCALE) * SENSITIVITY
+    let scaleMovement = (graphScale / DEFAULT_RAW_SCALE) * MOUSE_SENSITIVITY
 
     graphY += event.movementY * scaleMovement // graphx is flipped from how it'd usually be
     graphX -= event.movementX * scaleMovement
@@ -82,14 +89,14 @@ function screenResize() {
 
     // calculate vertical graph bounds
 
-    yDist = rawScale
+    yDist = graphScale
 
     yFrom = graphY - yDist
     yTo = graphY + yDist
 
     // calculate horizontal graph bounds
 
-    xDist = rawScale * aspectRatio
+    xDist = graphScale * aspectRatio
 
     xFrom = graphX - xDist
     xTo = graphX + xDist
@@ -116,6 +123,8 @@ function screenResize() {
 // event for clicking the "home" button
 function home() {
     rawScale = DEFAULT_RAW_SCALE; //reset default scale
+
+    calculateGraphScale()
 
     graphX = DEFAULT_GRAPH_X;
     graphY = DEFAULT_GRAPH_Y;
@@ -195,6 +204,8 @@ function draw() {
         }
     }
 
+    display("x: " + graphX + "<br>y: " + graphY + "<br>s: " + graphScale)
+
     // draw existing points
     drawPoints();
 }
@@ -210,6 +221,14 @@ function yScreenPos(num) {
 // easier function that uses both X and Y
 function screenPos(xNum, yNum) {
     return (xScreenPos(xNum), yScreenPos(yNum))
+}
+
+function calculateGraphScale() {
+    if (rawScale < 1) {
+        graphScale = 2 ** (rawScale - 1)
+    } else {
+        graphScale = rawScale
+    }
 }
 
 function drawPoints() {
@@ -237,7 +256,7 @@ function graph(graphPoints = true, restrictToViewport = false) {
 
     input = input.replace("**", "^")
 
-    let res = RES * rawScale;
+    let res = RES * graphScale;
 
     points = []
 
