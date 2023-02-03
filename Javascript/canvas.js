@@ -12,39 +12,27 @@ var aspectRatio = 1;
 
 const RES = 0.01;
 
-var yFrom = -10 / aspectRatio, yTo = 10 / aspectRatio
+//var yFrom = -10 / aspectRatio, yTo = 10 / aspectRatio
 addEventListener('resize', screenResize)
 
 var graphY = 0;
-
-screenResize()
+var graphX = 0;
 
 var rawScale = 1;
+
+screenResize()
 
 const SCALAR = 0.01
 
 var points = null
-
-var calculatedScale = 1; // default scale is 20/20
 
 // clear display
 document.getElementById("display").innerHTML = ""
 
 // Change the scale whenever the user uses the mousewheel
 addEventListener('wheel', function (event) {
-    let deltaY = event.deltaY * Math.sqrt(Math.abs(xTo - xFrom) / 20) * SCALAR;
-
-    if (event.deltaY < 0) { // scrolling in
-        xTo += deltaY
-        xFrom -= deltaY
-    }
-    else { // scrolling out
-        xTo += deltaY
-        xFrom -= deltaY
-    }
-
-    calculatedScale = Math.abs(xTo - xFrom) / 20; // calculate so we can use
-
+    rawScale += event.deltaY;
+    
     screenResize()
 
     try {
@@ -68,21 +56,11 @@ canvas.addEventListener('mousemove', function (event) {
     clientX += event.movementX
     clientY += event.movementY
 
-    xMouse -= clientX * sensitivity
-    yMouse -= clientY * sensitivity
-
-    calculatedScale = Math.abs(xTo - xFrom) / 20; // always calculate so other functions can use
-
-    // multiply by calculatedScale so we still move at a consistent pace nomatter how big or small the grid is
-    xTo += xMouse * Math.abs(calculatedScale)
-    xFrom += xMouse * Math.abs(calculatedScale)
-    // we subtract with the Y-Axis as the Y-Axis is drawn reverse of the X-Axis
-    yTo -= yMouse * Math.abs(calculatedScale)
-    yFrom -= yMouse * Math.abs(calculatedScale)
+    xMouse -= clientX * sensitivity // ???
+    yMouse -= clientY * sensitivity // ???
 
     graphY -= yMouse * Math.abs(calculatedScale)
-    
-    display(graphY)
+    graphX -= xMouse * Math.abs(calculatedScale)
 
     try {
         graph(true)
@@ -93,26 +71,33 @@ canvas.addEventListener('mousemove', function (event) {
 
     draw()
 
-    // set the mouse position for next frame
-    xMouse = clientX * sensitivity
-    yMouse = clientY * sensitivity
+    xMouse = clientX * sensitivity // ???
+    yMouse = clientY * sensitivity // ???
 })
 
 // uses the aspect ratio of the users screen to make the grid out of squares
 function screenResize() {
     aspectRatio = window.innerWidth / window.innerHeight
 
-    yDist = (xTo / aspectRatio - xFrom / aspectRatio) / 2
+    yDist = rawScale
 
     yFrom = graphY - yDist
     yTo = graphY + yDist
+
+    xDist = rawScale * aspectRatio
+
+    xFrom = graphX - xDist
+    xTo = graphX + xDist
 
     lineSpacing = Math.floor((Math.floor(xTo) - Math.floor(xFrom)) / 10)
 
     let leftDigit = Math.floor(lineSpacing / (10 ** (lineSpacing.toString().length - 1)))
     
-    if (leftDigit > 5) { leftDigit = 5}
-    else if (leftDigit > 2) {leftDigit = 2}
+    if (leftDigit > 5) {
+        leftDigit = 5
+    } else if (leftDigit > 2) {
+        leftDigit = 2
+    }
 
     lineSpacing = (10 ** (lineSpacing.toString().length - 1)) * leftDigit
 
@@ -121,10 +106,13 @@ function screenResize() {
 
 // event for clicking the "home" button
 function home() {
-    xFrom = -10 // default xFrom
-    xTo = 10 // default xTo
-    screenResize() // auto resize yTo and yFrom
-    calculatedScale = Math.abs(xTo - xFrom) / 20; // recalculate scale
+    rawScale = 1;
+
+    graphX = 0;
+    graphY = 0;
+
+    screenResize()
+
     try {
         graph(false)
     }
@@ -135,6 +123,8 @@ function home() {
 
 // This method is called at program start and anytime the lineSpacing of the window changes, redrawing the entire program onto screen.
 function draw() {
+    display(graphX, graphY)
+    
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
 
@@ -238,8 +228,6 @@ function drawPoints() {
 function graph(draw = true) {
     var input = document.getElementById("input").value
 
-    /*let out = eval(Function("return " + input) + "; anonymous();");*/
-
     var inputSplit = input.split("y=")[1].split('');
 
     var vars = []
@@ -267,7 +255,7 @@ function graph(draw = true) {
     
     //console.log(assembledFunction)
 
-    let res = RES * calculatedScale;
+    let res = RES * rawScale;
 
     points = []
 
@@ -275,7 +263,7 @@ function graph(draw = true) {
         var out = eval(assembledFunction + "0, " + x + ")");
       
         if (out < yFrom || out > yTo) {
-          continue;
+          continue; // owned
         }
 
         points.push({
@@ -296,4 +284,8 @@ function display(text) {
 
 function isLetter(str) {
   return str.length === 1 && str.match(/[a-z]/i);
+}
+
+function multipleOf10(num) {
+    return 10 ** ((num.toString().length) - 1);
 }
