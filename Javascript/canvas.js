@@ -1,36 +1,43 @@
-const canvas = document.querySelector('#canvas')
+var canvas = document.getElementById("canvas")
 var ctx = canvas.getContext('2d')
 
-const sensitivity = 0.015
+//#region Constants
 
-var scale = 1, xFrom = -10, xTo = 10
+const TEXT_DISPLAY = document.getElementById("display")
+
+const SENSITIVITY = 0.015
+const RES = 0.01
+const DEFAULT_RAW_SCALE = 4.5
+
+const DEFAULT_GRAPH_X = 0
+const DEFAULT_GRAPH_Y = 0
+
+//#endregion Constants
+
+//#region initilize variables
+
 var mousedown = false
-var xMouse = 0, yMouse = 0
-var clientX = 0, clientY = 0
 var lineSpacing = 2
-var aspectRatio = 1;
 
-const RES = 0.01;
+var aspectRatio = 1
 
-//var yFrom = -10 / aspectRatio, yTo = 10 / aspectRatio
+var graphX = DEFAULT_GRAPH_X;
+var graphY = DEFAULT_GRAPH_Y;
+var rawScale = DEFAULT_RAW_SCALE;
+
+var points = null // points to draw
+
+////#endregion initilize variables
+
 addEventListener('resize', screenResize)
-
-var graphY = 0;
-var graphX = 0;
-
-var rawScale = 1;
 
 screenResize()
 
-const SCALAR = 0.01
-
-var points = null
-
-// clear display
-document.getElementById("display").innerHTML = ""
+display("") // reset display
 
 // Change the scale whenever the user uses the mousewheel
 addEventListener('wheel', function (event) {
+    
     rawScale += event.deltaY;
     
     screenResize()
@@ -39,7 +46,7 @@ addEventListener('wheel', function (event) {
         graph(true)
     }
     catch {
-        // nothing
+        // nothing, this is fine
     }
 })
 
@@ -53,14 +60,10 @@ canvas.addEventListener('mousemove', function (event) {
         return
     }
 
-    clientX += event.movementX
-    clientY += event.movementY
+    let scaleMovement = (rawScale / DEFAULT_RAW_SCALE) * SENSITIVITY
 
-    xMouse -= clientX * sensitivity // ???
-    yMouse -= clientY * sensitivity // ???
-
-    graphY -= yMouse * Math.abs(calculatedScale)
-    graphX -= xMouse * Math.abs(calculatedScale)
+    graphY += event.movementY * scaleMovement // graphx is flipped from how it'd usually be
+    graphX -= event.movementX * scaleMovement
 
     try {
         graph(true)
@@ -69,25 +72,28 @@ canvas.addEventListener('mousemove', function (event) {
         // nothing
     }
 
-    draw()
-
-    xMouse = clientX * sensitivity // ???
-    yMouse = clientY * sensitivity // ???
+    screenResize()
 })
 
 // uses the aspect ratio of the users screen to make the grid out of squares
 function screenResize() {
     aspectRatio = window.innerWidth / window.innerHeight
 
+    // calculate vertical graph bounds
+
     yDist = rawScale
 
     yFrom = graphY - yDist
     yTo = graphY + yDist
 
+    // calculate horizontal graph bounds
+
     xDist = rawScale * aspectRatio
 
     xFrom = graphX - xDist
     xTo = graphX + xDist
+
+    //#region Calculate Line Spacing
 
     lineSpacing = Math.floor((Math.floor(xTo) - Math.floor(xFrom)) / 10)
 
@@ -101,15 +107,17 @@ function screenResize() {
 
     lineSpacing = (10 ** (lineSpacing.toString().length - 1)) * leftDigit
 
+    //#endregion Calculate Line Spacing
+
     draw()
 }
 
 // event for clicking the "home" button
 function home() {
-    rawScale = 1;
+    rawScale = DEFAULT_RAW_SCALE; //reset default scale
 
-    graphX = 0;
-    graphY = 0;
+    graphX = DEFAULT_GRAPH_X;
+    graphY = DEFAULT_GRAPH_Y;
 
     screenResize()
 
@@ -123,8 +131,6 @@ function home() {
 
 // This method is called at program start and anytime the lineSpacing of the window changes, redrawing the entire program onto screen.
 function draw() {
-    display(graphX, graphY)
-    
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
 
@@ -263,7 +269,7 @@ function graph(draw = true) {
         var out = eval(assembledFunction + "0, " + x + ")");
       
         if (out < yFrom || out > yTo) {
-          continue; // owned
+          continue; // dont draw points outside of the viewport
         }
 
         points.push({
@@ -279,13 +285,9 @@ function graph(draw = true) {
 }
 
 function display(text) {
-    document.getElementById("display").innerHTML = text
+    TEXT_DISPLAY.innerHTML = text
 }
 
 function isLetter(str) {
   return str.length === 1 && str.match(/[a-z]/i);
-}
-
-function multipleOf10(num) {
-    return 10 ** ((num.toString().length) - 1);
 }
