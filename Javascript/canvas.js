@@ -103,8 +103,15 @@ function screenResize() {
 
     //#region Calculate Line Spacing
 
-    lineSpacing = Math.trunc((Math.trunc(xTo) - Math.trunc(xFrom)) / 10)
+    lineSpacing = xDist / 5
 
+    let temp = 0;
+    while (!Number.isInteger(lineSpacing))
+    {
+        lineSpacing *= 10
+        temp++
+    }
+    
     let leftDigit = Math.trunc(lineSpacing / (10 ** (lineSpacing.toString().length - 1)))
 
     if (leftDigit > 5) {
@@ -113,7 +120,7 @@ function screenResize() {
         leftDigit = 2
     }
 
-    lineSpacing = (10 ** (lineSpacing.toString().length - 1)) * leftDigit
+    lineSpacing = Math.round((10 ** (lineSpacing.toString().length - 1)) * leftDigit) / (10 ** temp)
 
     //#endregion Calculate Line Spacing
 
