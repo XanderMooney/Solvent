@@ -1,57 +1,52 @@
-const canvas = document.querySelector('#canvas')
+var canvas = document.getElementById("canvas")
 var ctx = canvas.getContext('2d')
 
-const sensitivity = 0.015
+//#region Constants
 
-var scale = 1, xFrom = -10, xTo = 10
+const TEXT_DISPLAY = document.getElementById("display")
+
+const SENSITIVITY = 0.015
+const RES = 0.01
+const DEFAULT_RAW_SCALE = 4.5
+
+const DEFAULT_GRAPH_X = 0
+const DEFAULT_GRAPH_Y = 0
+
+//#endregion Constants
+
+//#region initilize variables
+
 var mousedown = false
-var xMouse = 0, yMouse = 0
-var clientX = 0, clientY = 0
 var lineSpacing = 2
-var aspectRatio = 1;
 
-const RES = 0.01;
+var aspectRatio = 1
 
-var yFrom = -10 / aspectRatio, yTo = 10 / aspectRatio
+var graphX = DEFAULT_GRAPH_X;
+var graphY = DEFAULT_GRAPH_Y;
+var rawScale = DEFAULT_RAW_SCALE;
+
+var points = null // points to draw
+
+////#endregion initilize variables
+
 addEventListener('resize', screenResize)
-
-var graphY = 0;
 
 screenResize()
 
-var rawScale = 1;
-
-const SCALAR = 0.01
-
-var points = null
-
-var calculatedScale = 1; // default scale is 20/20
-
-// clear display
-document.getElementById("display").innerHTML = ""
+display("") // reset display
 
 // Change the scale whenever the user uses the mousewheel
 addEventListener('wheel', function (event) {
-    let deltaY = event.deltaY * Math.sqrt(Math.abs(xTo - xFrom) / 20) * SCALAR;
-
-    if (event.deltaY < 0) { // scrolling in
-        xTo += deltaY
-        xFrom -= deltaY
-    }
-    else { // scrolling out
-        xTo += deltaY
-        xFrom -= deltaY
-    }
-
-    calculatedScale = Math.abs(xTo - xFrom) / 20; // calculate so we can use
-
+    
+    rawScale += event.deltaY;
+    
     screenResize()
 
     try {
         graph(true)
     }
     catch {
-        // nothing
+        // nothing, this is fine
     }
 })
 
@@ -65,24 +60,10 @@ canvas.addEventListener('mousemove', function (event) {
         return
     }
 
-    clientX += event.movementX
-    clientY += event.movementY
+    let scaleMovement = (rawScale / DEFAULT_RAW_SCALE) * SENSITIVITY
 
-    xMouse -= clientX * sensitivity
-    yMouse -= clientY * sensitivity
-
-    calculatedScale = Math.abs(xTo - xFrom) / 20; // always calculate so other functions can use
-
-    // multiply by calculatedScale so we still move at a consistent pace nomatter how big or small the grid is
-    xTo += xMouse * Math.abs(calculatedScale)
-    xFrom += xMouse * Math.abs(calculatedScale)
-    // we subtract with the Y-Axis as the Y-Axis is drawn reverse of the X-Axis
-    yTo -= yMouse * Math.abs(calculatedScale)
-    yFrom -= yMouse * Math.abs(calculatedScale)
-
-    graphY -= yMouse * Math.abs(calculatedScale)
-    
-    display(graphY)
+    graphY += event.movementY * scaleMovement // graphx is flipped from how it'd usually be
+    graphX -= event.movementX * scaleMovement
 
     try {
         graph(true)
@@ -91,40 +72,55 @@ canvas.addEventListener('mousemove', function (event) {
         // nothing
     }
 
-    draw()
-
-    // set the mouse position for next frame
-    xMouse = clientX * sensitivity
-    yMouse = clientY * sensitivity
+    screenResize()
 })
 
 // uses the aspect ratio of the users screen to make the grid out of squares
 function screenResize() {
     aspectRatio = window.innerWidth / window.innerHeight
 
-    yDist = (xTo / aspectRatio - xFrom / aspectRatio) / 2
+    // calculate vertical graph bounds
+
+    yDist = rawScale
 
     yFrom = graphY - yDist
     yTo = graphY + yDist
+
+    // calculate horizontal graph bounds
+
+    xDist = rawScale * aspectRatio
+
+    xFrom = graphX - xDist
+    xTo = graphX + xDist
+
+    //#region Calculate Line Spacing
 
     lineSpacing = Math.floor((Math.floor(xTo) - Math.floor(xFrom)) / 10)
 
     let leftDigit = Math.floor(lineSpacing / (10 ** (lineSpacing.toString().length - 1)))
     
-    if (leftDigit > 5) { leftDigit = 5}
-    else if (leftDigit > 2) {leftDigit = 2}
+    if (leftDigit > 5) {
+        leftDigit = 5
+    } else if (leftDigit > 2) {
+        leftDigit = 2
+    }
 
     lineSpacing = (10 ** (lineSpacing.toString().length - 1)) * leftDigit
+
+    //#endregion Calculate Line Spacing
 
     draw()
 }
 
 // event for clicking the "home" button
 function home() {
-    xFrom = -10 // default xFrom
-    xTo = 10 // default xTo
-    screenResize() // auto resize yTo and yFrom
-    calculatedScale = Math.abs(xTo - xFrom) / 20; // recalculate scale
+    rawScale = DEFAULT_RAW_SCALE; //reset default scale
+
+    graphX = DEFAULT_GRAPH_X;
+    graphY = DEFAULT_GRAPH_Y;
+
+    screenResize()
+
     try {
         graph(false)
     }
@@ -238,8 +234,6 @@ function drawPoints() {
 function graph(draw = true) {
     var input = document.getElementById("input").value
 
-    /*let out = eval(Function("return " + input) + "; anonymous();");*/
-
     var inputSplit = input.split("y=")[1].split('');
 
     var vars = []
@@ -267,7 +261,7 @@ function graph(draw = true) {
     
     //console.log(assembledFunction)
 
-    let res = RES * calculatedScale;
+    let res = RES * rawScale;
 
     points = []
 
@@ -275,7 +269,7 @@ function graph(draw = true) {
         var out = eval(assembledFunction + "0, " + x + ")");
       
         if (out < yFrom || out > yTo) {
-          continue;
+          continue; // dont draw points outside of the viewport
         }
 
         points.push({
@@ -291,7 +285,7 @@ function graph(draw = true) {
 }
 
 function display(text) {
-    document.getElementById("display").innerHTML = text
+    TEXT_DISPLAY.innerHTML = text
 }
 
 function isLetter(str) {
