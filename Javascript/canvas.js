@@ -1,5 +1,5 @@
-const CANVAS = document.getElementById("canvas")
-const CTX = CANVAS.getContext('2d')
+var canvas = document.getElementById("canvas")
+var ctx = canvas.getContext('2d')
 
 //#region Constants
 
@@ -59,11 +59,11 @@ addEventListener('wheel', function (event) {
 })
 
 // two events to tell if we have the mouse pressed down
-CANVAS.addEventListener('mousedown', function () { mousedown = true })
-CANVAS.addEventListener('mouseup', function () { mousedown = false })
+canvas.addEventListener('mousedown', function () { mousedown = true })
+canvas.addEventListener('mouseup', function () { mousedown = false })
 
 // event ran on mouse move
-CANVAS.addEventListener('mousemove', function (event) {
+canvas.addEventListener('mousemove', function (event) {
     if (!mousedown) {
         return
     }
@@ -87,8 +87,8 @@ var temp = 0;
 
 // uses the aspect ratio of the users screen to make the grid out of squares
 function screenResize() {
-    CANVAS.width = window.innerWidth
-    CANVAS.height = window.innerHeight
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
 
     aspectRatio = window.innerWidth / window.innerHeight
 
@@ -153,66 +153,66 @@ function home() {
 
 // This method is called at program start and anytime the lineSpacing of the window changes, redrawing the entire program onto screen.
 function draw() {
-    CTX.clearRect(0, 0, CANVAS.width, CANVAS.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     for (let i = xFrom - (xFrom % lineSpacing); i < xTo; i += lineSpacing) {
 
         if (i != 0) {
-            CTX.lineWidth = 1
-            CTX.strokeStyle = '#848484'
+            ctx.lineWidth = 1
+            ctx.strokeStyle = '#848484'
         } else {
-            CTX.lineWidth = 1.25
-            CTX.strokeStyle = '#000000'
+            ctx.lineWidth = 1.25
+            ctx.strokeStyle = '#000000'
         }
 
-        CTX.beginPath()
-        CTX.moveTo(xScreenPos(i), 0)
-        CTX.lineTo(xScreenPos(i), CANVAS.height)
-        CTX.stroke()
+        ctx.beginPath()
+        ctx.moveTo(xScreenPos(i), 0)
+        ctx.lineTo(xScreenPos(i), canvas.height)
+        ctx.stroke()
 
         fixed_i = fixFloat(i)
 
         if (yFrom > 0) {
-            CTX.font = "12px sans-serif"
-            CTX.fillText(fixed_i, xScreenPos(i), CANVAS.height - 20)
+            ctx.font = "12px sans-serif"
+            ctx.fillText(fixed_i, xScreenPos(i), canvas.height - 20)
         }
         else if (yTo < 0) {
-            CTX.font = "12px sans-serif"
-            CTX.fillText(fixed_i, xScreenPos(i), 20)
+            ctx.font = "12px sans-serif"
+            ctx.fillText(fixed_i, xScreenPos(i), 20)
         }
         else {
-            CTX.font = "18px sans-serif"
-            CTX.fillText(fixed_i, xScreenPos(i), yScreenPos(0))
+            ctx.font = "18px sans-serif"
+            ctx.fillText(fixed_i, xScreenPos(i), yScreenPos(0))
         }
     }
 
     for (let i = yFrom - (yFrom % lineSpacing); i < yTo; i += lineSpacing) {
         if (i != 0) {
-            CTX.lineWidth = 1
-            CTX.strokeStyle = '#848484'
+            ctx.lineWidth = 1
+            ctx.strokeStyle = '#848484'
         } else {
-            CTX.lineWidth = 1.25
-            CTX.strokeStyle = '#000000'
+            ctx.lineWidth = 1.25
+            ctx.strokeStyle = '#000000'
         }
 
-        CTX.beginPath()
-        CTX.moveTo(0, yScreenPos(i))
-        CTX.lineTo(CANVAS.width, yScreenPos(i))
-        CTX.stroke()
+        ctx.beginPath()
+        ctx.moveTo(0, yScreenPos(i))
+        ctx.lineTo(canvas.width, yScreenPos(i))
+        ctx.stroke()
 
         fixed_i = fixFloat(i)
 
         if (xFrom > 0) {
-            CTX.font = "12px sans-serif"
-            CTX.fillText(fixed_i, 20, yScreenPos(i))
+            ctx.font = "12px sans-serif"
+            ctx.fillText(fixed_i, 20, yScreenPos(i))
         }
         else if (xTo < 0) {
-            CTX.font = "12px sans-serif"
-            CTX.fillText(fixed_i, CANVAS.width - 20, yScreenPos(i))
+            ctx.font = "12px sans-serif"
+            ctx.fillText(fixed_i, canvas.width - 20, yScreenPos(i))
         }
         else {
-            CTX.font = "18px sans-serif"
-            CTX.fillText(fixed_i, xScreenPos(0), yScreenPos(i))
+            ctx.font = "18px sans-serif"
+            ctx.fillText(fixed_i, xScreenPos(0), yScreenPos(i))
         }
     }
 
@@ -224,11 +224,11 @@ function draw() {
 
 // global method to convert from our built in numbers to screen numbers
 function xScreenPos(num) {
-    return CANVAS.width * -((num - xFrom) / (xFrom - xTo))
+    return canvas.width * -((num - xFrom) / (xFrom - xTo))
 }
 // global method to convert from our built in numbers to screen numbers; the Y-axis is drawn reverse of the X-Axis
 function yScreenPos(num) {
-    return CANVAS.height * -((num - yTo) / (yTo - yFrom))
+    return canvas.height * -((num - yTo) / (yTo - yFrom))
 }
 // easier function that uses both X and Y
 function screenPos(xNum, yNum) {
@@ -248,19 +248,19 @@ function drawPoints() {
         return; // return if points are empty
     }
 
-    CTX.beginPath(); // begin drawing
+    ctx.beginPath(); // begin drawing
 
-    CTX.strokeStyle = "dodgerBlue" // blue lines
-    CTX.lineWidth = 3 // wide lines
+    ctx.strokeStyle = "dodgerBlue" // blue lines
+    ctx.lineWidth = 3 // wide lines
 
-    CTX.moveTo(xScreenPos(points[0].x), yScreenPos(points[0].y)) // move to first point
+    ctx.moveTo(xScreenPos(points[0].x), yScreenPos(points[0].y)) // move to first point
 
     // starting at the second point, draw the entire function
     for (let i = 1; i < points.length; i++) {
-        CTX.lineTo(xScreenPos(points[i].x), yScreenPos(points[i].y))
+        ctx.lineTo(xScreenPos(points[i].x), yScreenPos(points[i].y))
     }
 
-    CTX.stroke();
+    ctx.stroke();
 }
 
 function graph(graphPoints = true, restrictToViewport = false) {
