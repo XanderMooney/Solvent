@@ -8,5 +8,5 @@ Features:
   - Currently 2 issues:
   - JS *really* doesn't want to properly round 0 to 0
   - Scaling gets slower/faster as you zoom in/out (hard to fix due to limitations of JS)
-- Simple graphing functionality (of one-sided equations)
+- Simple graphing functionality of one-sided equations
 ![image](https://user-images.githubusercontent.com/113313704/226614325-2ba2a373-17f8-444a-9add-89d64c53a271.png)
