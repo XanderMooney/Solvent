@@ -41,26 +41,30 @@ display("") // clear display (if this code does not run we will know, as the dis
 
 home() // run home for coord display
 
-// Change the scale whenever the user uses the mousewheel
-addEventListener('wheel', function (event) {
 
-    rawScale += event.deltaY * SCROLL_SENSITIVITY;
+// <!> SCROLLING DISABLED FOR NOW <!>
 
-    calculateGraphScale()
+// // Change the scale whenever the user uses the mousewheel
+// addEventListener('wheel', function (event) {
 
-    screenResize()
+//     rawScale += event.deltaY * SCROLL_SENSITIVITY;
 
-    try {
-        graph(true)
-    }
-    catch {
-        // nothing, this is fine
-    }
-})
+//     calculateGraphScale()
+
+//     screenResize()
+
+//     try {
+//         graph(true)
+//     }
+//     catch {
+//         // nothing, this is fine
+//     }
+// })
 
 // two events to tell if we have the mouse pressed down
 canvas.addEventListener('mousedown', function () { mousedown = true })
 canvas.addEventListener('mouseup', function () { mousedown = false })
+canvas.addEventListener('mouseleave', function() {mousedown = false})
 
 // event ran on mouse move
 canvas.addEventListener('mousemove', function (event) {
@@ -194,7 +198,7 @@ function draw() {
             ctx.lineWidth = 1.25
             ctx.strokeStyle = '#000000'
         }
-
+        
         ctx.beginPath()
         ctx.moveTo(0, yScreenPos(i))
         ctx.lineTo(canvas.width, yScreenPos(i))
@@ -233,6 +237,10 @@ function yScreenPos(num) {
 // easier function that uses both X and Y
 function screenPos(xNum, yNum) {
     return (xScreenPos(xNum), yScreenPos(yNum))
+}
+
+function xCanvasPos(num) {
+
 }
 
 function calculateGraphScale() {
